@@ -107,8 +107,8 @@ Git
 Installation
 
 Clone the Repository
-git clone https://github.com/Sudhir4500/blog_platform.git
-cd blog_platform
+git clone https://github.com/Sudhir4500/blog-platform.git
+cd blog-platform
 
 
 Backend Setup (Django)
