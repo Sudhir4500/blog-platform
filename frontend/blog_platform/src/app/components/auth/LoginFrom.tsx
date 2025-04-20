@@ -6,7 +6,7 @@ import { useRouter } from "next/navigation";
 import { useState } from "react";
 
 interface LoginFormData {
-  username: string;
+  identifier: string; // renamed for clarity
   password: string;
 }
 
@@ -23,7 +23,11 @@ export default function LoginForm() {
   const onSubmit = async (data: LoginFormData) => {
     setErrorMessage(null);
     try {
-      const response = await loginUser(data);
+      // Send identifier as "username" to match backend expectations
+      const response = await loginUser({
+        username: data.identifier.trim().toLowerCase(),
+        password: data.password,
+      });
       login(response.user, response.access);
       router.push("/");
     } catch (err: any) {
@@ -47,12 +51,12 @@ export default function LoginForm() {
 
         <div className="space-y-2">
           <input
-            {...register("username", { required: "Username is required" })}
-            placeholder="Username"
+            {...register("identifier", { required: "Email or Username is required" })}
+            placeholder="Email or Username"
             className="w-full px-5 py-4 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 text-lg"
           />
-          {errors.username && (
-            <p className="text-red-500 text-sm">{errors.username.message}</p>
+          {errors.identifier && (
+            <p className="text-red-500 text-sm">{errors.identifier.message}</p>
           )}
         </div>
 

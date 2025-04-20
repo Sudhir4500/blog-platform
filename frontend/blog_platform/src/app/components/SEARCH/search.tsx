@@ -104,7 +104,7 @@ export default function Search() {
           type="text"
           value={query}
           onChange={(e) => setQuery(e.target.value)}
-          placeholder="Search posts by tags or profiles by username/email..."
+          placeholder="Search profiles by username/email..."
           className="w-full p-2 pl-10 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
           onFocus={() => query.trim() && setShowResults(true)}
         />

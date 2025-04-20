@@ -4,7 +4,9 @@ import Image from 'next/image';
 import { useEffect, useState } from 'react';
 import { useAuthStore } from '@/app/store/authStore';
 import { useRouter } from 'next/navigation';
-import { getUserById } from '@/app/lib/api/posts';
+import { getUserById } from '@/app/lib/api/auth';
+import FollowButton from '../follow/FollowButton';
+import FollowStats from '../follow/FollowStats';
 
 interface User {
   id: string;
@@ -12,6 +14,9 @@ interface User {
   email: string;
   bio?: string;
   avatar?: string;
+  followers_count?: number;
+  following_count?: number;
+  is_following?: boolean;
 }
 
 interface Props {
@@ -24,18 +29,19 @@ export default function UserProfileHeader({ userId }: Props) {
   const [loading, setLoading] = useState(true);
   const router = useRouter();
 
-  useEffect(() => {
-    const fetchUser = async () => {
-      try {
-        const data = await getUserById(userId);
-        setProfileUser(data);
-      } catch (err) {
-        console.error('Failed to load profile user:', err);
-      } finally {
-        setLoading(false);
-      }
-    };
+  const fetchUser = async () => {
+    try {
+      const data = await getUserById(userId);
+      console.log('UserProfileHeader: Fetched user data:', data);
+      setProfileUser(data);
+    } catch (err) {
+      console.error('UserProfileHeader: Failed to load profile user:', err);
+    } finally {
+      setLoading(false);
+    }
+  };
 
+  useEffect(() => {
     fetchUser();
   }, [userId]);
 
@@ -51,7 +57,6 @@ export default function UserProfileHeader({ userId }: Props) {
 
   return (
     <div className="bg-white rounded-2xl shadow-md p-6 sm:p-10 max-w-4xl mx-auto flex flex-col sm:flex-row items-center sm:items-start gap-6">
-      {/* Avatar */}
       <div className="relative w-32 h-32 sm:w-40 sm:h-40 rounded-full overflow-hidden ring-4 ring-blue-500 hover:scale-105 transition-transform duration-300 shadow-lg">
         <Image
           src={profileUser.avatar || '/default-avatar.png'}
@@ -60,20 +65,30 @@ export default function UserProfileHeader({ userId }: Props) {
           className="object-cover"
         />
       </div>
-
-      {/* Info */}
       <div className="flex flex-col items-center sm:items-start text-center sm:text-left w-full">
         <div className="flex items-center gap-3">
           <h2 className="text-3xl font-bold text-gray-800">{profileUser.username}</h2>
-          {isOwner && (
+          {isOwner ? (
             <button
               onClick={() => router.push('/profile')}
               className="bg-blue-600 text-white text-sm px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors duration-200"
             >
               Edit Profile
             </button>
+          ) : (
+            currentUser && (
+              <FollowButton
+                userId={userId}
+                isFollowing={profileUser.is_following || false}
+                onFollowChange={fetchUser}
+              />
+            )
           )}
         </div>
+        <FollowStats
+          followersCount={profileUser.followers_count || 0}
+          followingCount={profileUser.following_count || 0}
+        />
         {profileUser.bio && (
           <p className="mt-3 text-gray-600 text-base leading-relaxed">{profileUser.bio}</p>
         )}

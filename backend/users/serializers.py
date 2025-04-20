@@ -5,10 +5,13 @@ from django.contrib.auth.password_validation import validate_password
 
 class UserSerializer(serializers.ModelSerializer):
     avatar = serializers.SerializerMethodField()
+    followers_count = serializers.SerializerMethodField()
+    following_count = serializers.SerializerMethodField()
+    is_following = serializers.SerializerMethodField()
 
     class Meta:
         model = User
-        fields = ['id', 'username', 'email', 'bio', 'avatar']
+        fields = ['id', 'username', 'email', 'bio', 'avatar', 'followers_count', 'following_count', 'is_following']
 
     def get_avatar(self, obj):
         if obj.avatar:
@@ -16,7 +19,18 @@ class UserSerializer(serializers.ModelSerializer):
             return url
         return None
 
-# users/serializers.py
+    def get_followers_count(self, obj):
+        return obj.followers.count()
+
+    def get_following_count(self, obj):
+        return obj.following.count()
+
+    def get_is_following(self, obj):
+        request = self.context.get('request')
+        if request and request.user.is_authenticated:
+            return request.user.following.filter(id=obj.id).exists()
+        return False
+
 class RegisterSerializer(serializers.ModelSerializer):
     password = serializers.CharField(write_only=True, validators=[validate_password])
 

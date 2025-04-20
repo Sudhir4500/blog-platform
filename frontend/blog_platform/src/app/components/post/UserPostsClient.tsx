@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react';
 import { PostList } from './PostList';
 import { API } from '@/app/lib/api/auth';
 import UserProfileHeader from './UserProfileHeader';
+import { useAuthStore } from '@/app/store/authStore';
 
 type Props = {
   userId: string;
@@ -11,6 +12,7 @@ type Props = {
 
 const UserPostsClient = ({ userId }: Props) => {
   const [username, setUsername] = useState<string | null>(null);
+  const { user } = useAuthStore();
 
   useEffect(() => {
     const fetchUser = async () => {
@@ -26,6 +28,8 @@ const UserPostsClient = ({ userId }: Props) => {
     fetchUser();
   }, [userId]);
 
+  const isOwner = user?.id === userId;
+
   return (
     <>
       <UserProfileHeader userId={userId} />
@@ -38,7 +42,7 @@ const UserPostsClient = ({ userId }: Props) => {
           </div>
         </header>
         <main className="container mx-auto px-4 py-8">
-          <PostList userId={userId} />
+          <PostList userId={userId} isOwner={isOwner} />
         </main>
       </div>
     </>

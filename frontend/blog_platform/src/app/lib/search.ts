@@ -1,6 +1,4 @@
-// lib/search.ts
-import { API } from "./api/auth";
-
+import { API } from './api/auth';
 
 interface User {
   id: string;
@@ -8,6 +6,9 @@ interface User {
   email: string;
   bio?: string;
   avatar?: string;
+  followers_count?: number;
+  following_count?: number;
+  is_following?: boolean;
 }
 
 interface Post {
@@ -24,33 +25,39 @@ interface Post {
 }
 
 export const searchPostsByTags = async (tags: string): Promise<Post[]> => {
-    try {
-      console.log(`API call: GET /api/posts/search/?tags=${tags}`);
-      const res = await API.get(`/api/posts/search/`, {
-        params: { tags }  // This is the more standard way to pass query params
-      });
-      if (!Array.isArray(res.data)) {
-        return [];  // Return empty array instead of throwing error
-      }
-      return res.data;
-    } catch (error: any) {
-      console.error('Search posts error:', error.response?.data || error.message || error);
-      return [];  // Return empty array on error
-    }
-  };
-  
-  export const searchProfiles = async (query: string): Promise<User[]> => {
-    try {
-      console.log(`API call: GET /api/users/search/?query=${query}`);
-      const res = await API.get(`/api/users/search/`, {
-        params: { query }  // Standard way to pass query params
-      });
-      if (!Array.isArray(res.data)) {
-        return [];
-      }
-      return res.data;
-    } catch (error: any) {
-      console.error('Search profiles error:', error.response?.data || error.message || error);
+  try {
+    console.log(`API call: GET /api/posts/search/?tags=${tags}`);
+    const res = await API.get(`/api/posts/search/`, {
+      params: { tags },
+    });
+    if (!Array.isArray(res.data)) {
+      console.warn('searchPostsByTags: Response data is not an array:', res.data);
       return [];
     }
-  };
+    return res.data;
+  } catch (error: any) {
+    console.error('Search posts error:', error.response?.data || error.message || error);
+    return [];
+  }
+};
+
+export const searchProfiles = async (query: string): Promise<User[]> => {
+  try {
+    if (!query.trim()) {
+      console.warn('searchProfiles: Empty query provided');
+      return [];
+    }
+    console.log(`API call: GET /api/users/search/?query=${query}`);
+    const res = await API.get(`/api/users/search/`, {
+      params: { query },
+    });
+    if (!Array.isArray(res.data)) {
+      console.warn('searchProfiles: Response data is not an array:', res.data);
+      return [];
+    }
+    return res.data;
+  } catch (error: any) {
+    console.error('Search profiles error:', error.response?.data || error.message || error);
+    return [];
+  }
+};

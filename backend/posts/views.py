@@ -88,3 +88,20 @@ class UserPostsView(APIView):
             return Response(serializer.data, status=status.HTTP_200_OK)
         except User.DoesNotExist:
             return Response({'error': 'User not found'}, status=status.HTTP_404_NOT_FOUND)
+        
+
+class PostDeleteView(APIView):
+    permission_classes = [permissions.IsAuthenticated]
+
+    def delete(self, request, id):
+        try:
+            post = Post.objects.get(id=id)
+            if post.user != request.user:
+                logger.warning(f"User {request.user.username} attempted to delete post {id} owned by another user")
+                return Response({'error': 'You can only delete your own posts'}, status=status.HTTP_403_FORBIDDEN)
+            post.delete()
+            logger.info(f"Post {id} deleted by user {request.user.username}")
+            return Response({'message': 'Post deleted successfully'}, status=status.HTTP_204_NO_CONTENT)
+        except Post.DoesNotExist:
+            logger.error(f"Post {id} not found for deletion")
+            return Response({'error': 'Post not found'}, status=status.HTTP_404_NOT_FOUND)

@@ -1,4 +1,3 @@
-//store/authStore.ts
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
 
@@ -8,6 +7,9 @@ interface User {
   email: string;
   bio?: string;
   avatar?: string;
+  followers_count?: number;
+  following_count?: number;
+  is_following?: boolean;
 }
 
 interface AuthState {
@@ -23,15 +25,21 @@ export const useAuthStore = create<AuthState>()(
       user: null,
       token: null,
       login: (user, token) => {
-        console.log("Updating auth store with user:", user, "and token:", token.slice(0, 10) + "...");
+        if (!user?.id || !user.username || !user.email) {
+          console.error("Invalid user data provided to login");
+          throw new Error("Invalid user data");
+        }
+        if (!token) {
+          console.error("No token provided to login");
+          throw new Error("No token provided");
+        }
+        console.log("Updating auth store with user:", { id: user.id, username: user.username }, "and token:", token.slice(0, 10) + "...");
         set({ user, token });
       },
       logout: () => {
         console.log("Logging out, clearing auth store");
         set({ user: null, token: null });
-        // Explicitly clear persisted storage
         localStorage.removeItem("auth-storage");
-        localStorage.removeItem("auth-storage-state");
       },
     }),
     {
@@ -40,7 +48,10 @@ export const useAuthStore = create<AuthState>()(
   )
 );
 
-// Subscribe to state changes for debugging
+// Subscribe to state changes for debugging (limit sensitive data)
 useAuthStore.subscribe((state) => {
-  console.log("Auth store state changed:", state);
+  console.log("Auth store state changed:", {
+    user: state.user ? { id: state.user.id, username: state.user.username } : null,
+    token: state.token ? state.token.slice(0, 10) + "..." : null,
+  });
 });

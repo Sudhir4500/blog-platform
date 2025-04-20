@@ -64,17 +64,42 @@ export const createPost = async (formData: FormData): Promise<Post> => {
   }
 };
 
+export const updatePost = async (postId: string, formData: FormData): Promise<Post> => {
+  try {
+    console.log(`Updating post at /api/posts/${postId}/update/`);
+    const res = await API.patch(`/api/posts/${postId}/update/`, formData, {
+      headers: {
+        'Content-Type': 'multipart/form-data',
+      },
+    });
+    return res.data;
+  } catch (error: any) {
+    console.error('Update post error:', error.response?.data || error);
+    throw error;
+  }
+};
+
+export const deletePost = async (postId: string): Promise<void> => {
+  try {
+    console.log(`Deleting post at /api/posts/${postId}/delete/`);
+    await API.delete(`/api/posts/${postId}/delete/`);
+  } catch (error: any) {
+    console.error('Delete post error:', error.response?.data || error);
+    throw error;
+  }
+};
+
 export const getUserPosts = async (userId: string): Promise<Post[]> => {
-  console.log('getUserPosts called with userId:', userId); // Debug log
+  console.log('getUserPosts called with userId:', userId);
   if (!userId || userId === 'undefined') {
     console.log('Invalid user ID, throwing error');
     throw new Error('Invalid user ID');
   }
   try {
-    console.log('Making API request to:', `/api/posts/user/${userId}/`); // Debug log
+    console.log('Making API request to:', `/api/posts/user/${userId}/`);
     const res = await API.get(`/api/posts/user/${userId}/`);
     const posts = Array.isArray(res.data) ? res.data : res.data.posts || [];
-    console.log('API response:', posts); // Debug log
+    console.log('API response:', posts);
     if (!Array.isArray(posts)) {
       throw new Error('Invalid response: Expected an array of posts');
     }

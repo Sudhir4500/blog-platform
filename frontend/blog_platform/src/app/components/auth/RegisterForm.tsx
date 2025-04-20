@@ -15,19 +15,25 @@ export default function RegisterForm() {
 
   const onSubmit = async (data: any) => {
     try {
-      const { access, refresh } = await registerUser(data);
+      const normalizedData = {
+        ...data,
+        username: data.username.trim().toLowerCase(), // 👈 force lowercase
+      };
+  
+      const { access, refresh } = await registerUser(normalizedData);
       Cookies.set("token", access, { path: "/" });
       Cookies.set("refreshToken", refresh, { path: "/" });
-
+  
       const user = await fetchMe();
       login(user, access);
-
+  
       router.push("/");
     } catch (err: any) {
       console.error("Registration error:", err);
       setError(err?.response?.data?.error || "Registration failed.");
     }
   };
+  
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-100 px-4">

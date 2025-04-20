@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { useState } from "react";
 import { useAuthStore } from "@/app/store/authStore";
-import Search from "../comment/SEARCH/search";
+import Search from "../SEARCH/search";
 import LogoutButton from "../logoutbutton";
 import NewPostButton from "./NewPostButton";
 import { HiMenu, HiX } from "react-icons/hi";
@@ -51,7 +51,7 @@ export default function Navbar() {
         <div className="hidden md:flex items-center space-x-4">
           {user ? (
             <>
-              <span  className="text-gray-700 font-bold ">Hi, {user.username}</span>
+              <span  className="text-gray-700 font-bold ">Hi, {user?.username && user.username.charAt(0).toUpperCase() + user.username.slice(1)}</span>
               <MyPostsButton />
               <NewPostButton />
               <LogoutButton />
@@ -87,7 +87,9 @@ export default function Navbar() {
           )}
           {user ? (
             <>
-              <div  className="text-gray-700 font-medium" >Hi, {user.username}</div>
+              <div className="text-gray-700 font-medium">
+  Hi, {user?.username && user.username.charAt(0).toUpperCase() + user.username.slice(1)}
+</div>
               <MyPostsButton/>
               <NewPostButton className="w-full py-3 bg-blue-600 hover:bg-blue-700 transition text-white rounded-lg" />
               <LogoutButton  />

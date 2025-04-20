@@ -3,12 +3,14 @@ import Cookies from 'js-cookie';
 import { useAuthStore } from '@/app/store/authStore';
 
 export const API = axios.create({
-  baseURL: process.env.NEXT_PUBLIC_API_URL ,
+  baseURL: process.env.NEXT_PUBLIC_API_URL,
 });
 
-// Attach the token to every request except auth endpoints
 API.interceptors.request.use((config) => {
-  const isAuthEndpoint = config.url?.includes('/api/auth/login/') || config.url?.includes('/api/auth/register/') || config.url?.includes('/api/auth/token/refresh/');
+  const isAuthEndpoint =
+    config.url?.includes('/api/auth/login/') ||
+    config.url?.includes('/api/auth/register/') ||
+    config.url?.includes('/api/auth/token/refresh/');
   const token = Cookies.get('session_access_token');
   if (token && !isAuthEndpoint) {
     config.headers.Authorization = `Bearer ${token}`;
@@ -21,7 +23,6 @@ API.interceptors.request.use((config) => {
   return config;
 });
 
-// Handle 401 errors by refreshing the token
 API.interceptors.response.use(
   (response) => response,
   async (error) => {
@@ -108,9 +109,43 @@ export const updateUserProfile = async (userId: string, formData: FormData) => {
         'Content-Type': 'multipart/form-data',
       },
     });
+    console.log('Profile update successful:', res.data);
     return res.data;
   } catch (error: any) {
     console.error('Profile update error:', error.response?.data || error);
+    throw error;
+  }
+};
+
+export const followUser = async (userId: string) => {
+  try {
+    const res = await API.post(`/api/users/${userId}/follow/`);
+    console.log('Follow successful:', res.data);
+    return res.data; // Returns { message, user }
+  } catch (error: any) {
+    console.error('Follow error:', error.response?.data || error);
+    throw error;
+  }
+};
+
+export const unfollowUser = async (userId: string) => {
+  try {
+    const res = await API.post(`/api/users/${userId}/unfollow/`);
+    console.log('Unfollow successful:', res.data);
+    return res.data; // Returns { message, user }
+  } catch (error: any) {
+    console.error('Unfollow error:', error.response?.data || error);
+    throw error;
+  }
+};
+
+export const getUserById = async (userId: string) => {
+  try {
+    const res = await API.get(`/api/users/${userId}/`);
+    console.log('Fetched user data:', res.data);
+    return res.data;
+  } catch (error: any) {
+    console.error('Fetch user error:', error.response?.data || error);
     throw error;
   }
 };
