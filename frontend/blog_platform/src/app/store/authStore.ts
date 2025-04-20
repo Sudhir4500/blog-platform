@@ -21,7 +21,7 @@ interface AuthState {
 
 export const useAuthStore = create<AuthState>()(
   persist(
-    (set) => ({
+    (set, get) => ({
       user: null,
       token: null,
       login: (user, token) => {
@@ -33,7 +33,10 @@ export const useAuthStore = create<AuthState>()(
           console.error("No token provided to login");
           throw new Error("No token provided");
         }
-        console.log("Updating auth store with user:", { id: user.id, username: user.username }, "and token:", token.slice(0, 10) + "...");
+        console.log("Updating auth store with user:", {
+          id: user.id,
+          username: user.username
+        }, "and token:", token.slice(0, 10) + "...");
         set({ user, token });
       },
       logout: () => {
@@ -44,11 +47,23 @@ export const useAuthStore = create<AuthState>()(
     }),
     {
       name: "auth-storage",
+      onRehydrateStorage: () => (state) => {
+        const user = state?.user;
+        if (!user?.id) {
+          console.warn("No user ID found in persisted state, logging out.");
+          state?.logout?.();
+        } else {
+          console.log("Rehydrated auth store with user:", {
+            id: user.id,
+            username: user.username
+          });
+        }
+      },
     }
   )
 );
 
-// Subscribe to state changes for debugging (limit sensitive data)
+// Debug logging
 useAuthStore.subscribe((state) => {
   console.log("Auth store state changed:", {
     user: state.user ? { id: state.user.id, username: state.user.username } : null,
