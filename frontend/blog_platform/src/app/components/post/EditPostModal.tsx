@@ -5,7 +5,7 @@ import { updatePost } from '@/app/lib/api/posts';
 import { toast } from 'react-hot-toast';
 import Image from 'next/image';
 import { motion, AnimatePresence } from 'framer-motion';
-
+import ImageReviewer from '../image/ImageReviewer';
 interface Post {
   id: string;
   title: string;
@@ -31,6 +31,7 @@ export default function EditPostModal({ post, isOpen, onClose, onUpdate }: EditP
   const [tags, setTags] = useState<string[]>(post.tags?.map((tag) => tag.name) || []);
   const [images, setImages] = useState<File[]>([]);
   const [imagePreviews, setImagePreviews] = useState<string[]>([]);
+  const [selectedImageIndex, setSelectedImageIndex] = useState<number | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const MAX_TAGS = 10;
 
@@ -42,6 +43,7 @@ export default function EditPostModal({ post, isOpen, onClose, onUpdate }: EditP
       setTagInput('');
       setImages([]);
       setImagePreviews([]);
+      setSelectedImageIndex(null);
     }
   }, [isOpen, post]);
 
@@ -76,6 +78,19 @@ export default function EditPostModal({ post, isOpen, onClose, onUpdate }: EditP
   const removeImage = (index: number) => {
     setImages((prev) => prev.filter((_, i) => i !== index));
     setImagePreviews((prev) => prev.filter((_, i) => i !== index));
+    if (selectedImageIndex === index) {
+      setSelectedImageIndex(null);
+    } else if (selectedImageIndex !== null && index < selectedImageIndex) {
+      setSelectedImageIndex(selectedImageIndex - 1);
+    }
+  };
+
+  const openImageReviewer = (index: number) => {
+    setSelectedImageIndex(index);
+  };
+
+  const closeImageReviewer = () => {
+    setSelectedImageIndex(null);
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -127,7 +142,7 @@ export default function EditPostModal({ post, isOpen, onClose, onUpdate }: EditP
             animate={{ scale: 1, opacity: 1 }}
             exit={{ scale: 0.95, opacity: 0 }}
             transition={{ duration: 0.2 }}
-            className="bg-white bg-opacity-90 rounded-lg p-6 w-full max-w-[800px] max-h-[90vh] overflow-y-auto shadow-xl scrollbar-hide"
+            className="bg-white bg-opacity-90 rounded-lg p-6 w-full max-w-md max-h-[90vh] overflow-y-auto shadow-xl"
           >
             <h2 className="text-xl font-bold mb-4 text-gray-800">Edit Post</h2>
             <form onSubmit={handleSubmit}>
@@ -220,12 +235,19 @@ export default function EditPostModal({ post, isOpen, onClose, onUpdate }: EditP
                         className="relative w-full h-24 group"
                         title={images[index].name}
                       >
-                        <Image
-                          src={preview}
-                          alt={`Preview ${images[index].name}`}
-                          fill
-                          className="object-cover rounded"
-                        />
+                        <button
+                          type="button"
+                          onClick={() => openImageReviewer(index)}
+                          className="w-full h-full focus:outline-none focus:ring-2 focus:ring-blue-500"
+                          aria-label={`View image ${images[index].name}`}
+                        >
+                          <Image
+                            src={preview}
+                            alt={`Preview ${images[index].name}`}
+                            fill
+                            className="object-cover rounded"
+                          />
+                        </button>
                         <button
                           type="button"
                           onClick={() => removeImage(index)}
@@ -261,6 +283,14 @@ export default function EditPostModal({ post, isOpen, onClose, onUpdate }: EditP
               </div>
             </form>
           </motion.div>
+          {selectedImageIndex !== null && (
+            <ImageReviewer
+              images={imagePreviews}
+              initialIndex={selectedImageIndex}
+              onClose={closeImageReviewer}
+              imageNames={images.map((img) => img.name)}
+            />
+          )}
         </motion.div>
       )}
     </AnimatePresence>
