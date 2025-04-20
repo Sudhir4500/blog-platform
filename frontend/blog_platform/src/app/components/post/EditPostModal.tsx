@@ -142,7 +142,7 @@ export default function EditPostModal({ post, isOpen, onClose, onUpdate }: EditP
             animate={{ scale: 1, opacity: 1 }}
             exit={{ scale: 0.95, opacity: 0 }}
             transition={{ duration: 0.2 }}
-            className="bg-white bg-opacity-90 rounded-lg p-6 w-full max-w-md max-h-[90vh] overflow-y-auto shadow-xl"
+            className="bg-white bg-opacity-90 rounded-lg p-6 w-full max-w-[800px] max-h-[90vh] overflow-y-auto shadow-xl"
           >
             <h2 className="text-xl font-bold mb-4 text-gray-800">Edit Post</h2>
             <form onSubmit={handleSubmit}>
