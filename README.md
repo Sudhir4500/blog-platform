@@ -55,7 +55,8 @@ Git, GitHub
 
 
 # Home Page
-<img width="884" alt="Screenshot 2025-04-19 224308" src="https://github.com/user-attachments/assets/0e354e21-28ca-4165-a249-e953f8afc0e6" />
+<img width="884" alt="Screenshot 2025-04-19 224308" src="https://github.com/user-attachments/assets/e8d803d2-fe46-4900-82de-27bb7eafd1d5" />
+
 
 
 
@@ -67,7 +68,8 @@ Git, GitHub
 
 
 # Create New Post
-<img width="895" alt="image" src="https://github.com/user-attachments/assets/5a4c47f6-3ff7-42a3-bc29-1c1ea2342fa9" />
+<img width="929" alt="image" src="https://github.com/user-attachments/assets/7a714084-7900-47aa-b78c-1bce78a8300a" />
+
 
 
 
@@ -86,7 +88,8 @@ Git, GitHub
 
 
 # User Profile
-<img width="937" alt="image" src="https://github.com/user-attachments/assets/2d82c081-c1ca-484d-8413-aca15f2bf2b7" />
+<img width="928" alt="image" src="https://github.com/user-attachments/assets/97b85af1-42e9-4f09-af26-f66dff6b6606" />
+
 
 
 
