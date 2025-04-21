@@ -4,6 +4,7 @@ import { useAuthStore } from "@/app/store/authStore";
 import { loginUser } from "@/app/lib/api/auth";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useState } from "react";
+import Link from "next/link";
 
 interface LoginFormData {
   identifier: string;
@@ -87,6 +88,12 @@ export default function LoginForm() {
         >
           Log In
         </button>
+        <p className="text-sm text-center text-gray-600">
+          Create new account?{" "}
+          <Link href="/register" className="text-blue-600 hover:underline">
+            Register
+          </Link>
+        </p>
       </form>
     </div>
   );
