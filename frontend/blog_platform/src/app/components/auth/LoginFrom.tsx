@@ -37,7 +37,7 @@ export default function LoginForm() {
       });
 
       // Optional: Redirect to original page if "next" param exists
-      const nextPath = searchParams.get("next") || "/profile";
+      const nextPath = searchParams.get("next") || "/";
       router.replace(nextPath);
     } catch (err: any) {
       const message =
