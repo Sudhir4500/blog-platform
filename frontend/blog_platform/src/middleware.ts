@@ -29,7 +29,7 @@ export function middleware(request: NextRequest) {
 
   if (!token && !isPublic) {
     const loginUrl = new URL('/login', request.url);
-    loginUrl.searchParams.set('next', pathname || '/profile');
+    loginUrl.searchParams.set('next', pathname || '/');
     return NextResponse.redirect(loginUrl);
   }
   
