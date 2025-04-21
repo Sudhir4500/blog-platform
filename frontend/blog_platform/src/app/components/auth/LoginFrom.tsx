@@ -2,11 +2,11 @@
 import { useForm } from "react-hook-form";
 import { useAuthStore } from "@/app/store/authStore";
 import { loginUser } from "@/app/lib/api/auth";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { useState } from "react";
 
 interface LoginFormData {
-  identifier: string; // renamed for clarity
+  identifier: string;
   password: string;
 }
 
@@ -16,20 +16,29 @@ export default function LoginForm() {
     handleSubmit,
     formState: { errors },
   } = useForm<LoginFormData>();
+
   const { login } = useAuthStore();
   const router = useRouter();
+  const searchParams = useSearchParams();
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
   const onSubmit = async (data: LoginFormData) => {
     setErrorMessage(null);
     try {
-      // Send identifier as "username" to match backend expectations
       const response = await loginUser({
         username: data.identifier.trim().toLowerCase(),
         password: data.password,
       });
-      login(response.user, response.access);
-      router.push("/");
+
+      // Wait until Zustand updates before redirecting
+      await new Promise((resolve) => {
+        login(response.user, response.access);
+        setTimeout(resolve, 50); // small wait to avoid race condition
+      });
+
+      // Optional: Redirect to original page if "next" param exists
+      const nextPath = searchParams.get("next") || "/profile";
+      router.replace(nextPath);
     } catch (err: any) {
       const message =
         err.response?.data?.error || "Login failed. Please check your credentials.";
