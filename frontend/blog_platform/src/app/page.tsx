@@ -5,6 +5,8 @@ import { useAuthStore } from "@/app/store/authStore";
 import { getPosts } from "@/app/lib/api/posts";
 import { fetchMe } from "@/app/lib/api/auth";
 import PostCard from "@/app/components/post/PostCard";
+import FollowingPosts from "@/app/components/post/FollowingPosts";
+import PostFeedToggle from "./components/shared/PostFeedToggle";
 import { useRouter } from "next/navigation";
 import Cookies from 'js-cookie';
 
@@ -27,6 +29,7 @@ export default function PostFeedPage() {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [isAuthChecked, setIsAuthChecked] = useState(false);
+  const [activeTab, setActiveTab] = useState<"all" | "following">("all");
   const router = useRouter();
 
   useEffect(() => {
@@ -52,7 +55,7 @@ export default function PostFeedPage() {
   }, [user, login, router]);
 
   useEffect(() => {
-    if (!isAuthChecked || !user) return;
+    if (!isAuthChecked || !user || activeTab !== "all") return;
 
     const fetchPosts = async () => {
       setIsLoading(true);
@@ -71,20 +74,27 @@ export default function PostFeedPage() {
     };
 
     fetchPosts();
-  }, [isAuthChecked, user]);
+  }, [isAuthChecked, user, activeTab]);
 
   if (!isAuthChecked || !user) return null;
 
   return (
-    <div className="max-w-2xl mx-auto space-y-6 p-4">
-      <h1 className="text-2xl font-bold my-4">Posts</h1>
-      {error && <div className="text-red-500 text-center">{error}</div>}
-      {isLoading ? (
-        <p className="text-center text-gray-400">Loading posts...</p>
-      ) : posts.length === 0 ? (
-        <p className="text-center text-gray-400">No posts yet</p>
+    <div className="container mx-auto p-4 max-w-2xl">
+      <PostFeedToggle activeTab={activeTab} setActiveTab={setActiveTab} />
+      {activeTab === "all" ? (
+        <div className="space-y-6">
+          <h1 className="text-2xl font-bold my-4">Posts</h1>
+          {error && <div className="text-red-500 text-center">{error}</div>}
+          {isLoading ? (
+            <p className="text-center text-gray-400">Loading posts...</p>
+          ) : posts.length === 0 ? (
+            <p className="text-center text-gray-400">No posts yet</p>
+          ) : (
+            posts.map((post) => <PostCard key={post.id} post={post} />)
+          )}
+        </div>
       ) : (
-        posts.map((post) => <PostCard key={post.id} post={post} />)
+        <FollowingPosts />
       )}
     </div>
   );

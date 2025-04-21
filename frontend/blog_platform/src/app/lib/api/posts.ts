@@ -119,3 +119,18 @@ export const getUserById = async (userId: string): Promise<User> => {
     throw error;
   }
 };
+
+export const getFollowingPosts = async (page = 1, limit = 10, tag?: string): Promise<Post[]> => {
+  try {
+    const url = tag ? `/api/posts/following/?page=${page}&limit=${limit}&tag=${encodeURIComponent(tag)}` : `/api/posts/following/?page=${page}&limit=${limit}`;
+    const res = await API.get(url);
+    const posts = res.data.results || res.data;
+    if (!Array.isArray(posts)) {
+      throw new Error("Invalid response: Expected an array of posts");
+    }
+    return posts;
+  } catch (error: any) {
+    console.error("Fetch following posts error:", error.response?.data || error.message || error);
+    throw error;
+  }
+};

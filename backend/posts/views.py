@@ -105,3 +105,19 @@ class PostDeleteView(APIView):
         except Post.DoesNotExist:
             logger.error(f"Post {id} not found for deletion")
             return Response({'error': 'Post not found'}, status=status.HTTP_404_NOT_FOUND)
+        
+
+class FollowingPostsView(APIView):
+    permission_classes = [permissions.IsAuthenticated]
+
+    def get(self, request):
+        tag = request.query_params.get('tag')
+        # Get the list of users the current user is following
+        following = request.user.following.all()
+        # Filter posts by users being followed
+        posts = Post.objects.filter(user__in=following)
+        # Apply tag filter if provided
+        if tag:
+            posts = posts.filter(tags__name=tag.lower())
+        serializer = PostSerializer(posts, many=True)
+        return Response(serializer.data, status=status.HTTP_200_OK)
